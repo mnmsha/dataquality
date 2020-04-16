@@ -1,0 +1,33 @@
+{% extends 'mainapp/base.html' %}
+
+{% block content %}
+    <div class="post">
+        {% if post.published_date %}
+            <div class="date">
+                {{ post.published_date }}
+            </div>
+        {% endif %}
+        <div>
+            <h2>Запрос</h2>
+            <p>Файл: {{ post.file }}</p>
+            <p>Источник: {{ post.source }}</p>
+
+            <h3>Качество источника</h3>
+            <p>Доступность: {{ post.availability }}</p>
+            <p>Авторитетность: {{ post.authority }}</p>
+            <p>Репутация: {{ post.popularuty }}</p>
+
+            <h3>Качество данных</h3>
+            <p>Интерпретируемость: {{ post.machinereadability }}</p>
+            <p>Достоверность: {{ post.reliability }}</p>
+            <p>Актуальность: {{ post.relevance }}</p>
+            <p>Полнота: {{ post.fullness }}</p>
+            
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" class="btn btn-success btn-lg">Оценить</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
