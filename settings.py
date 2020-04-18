@@ -122,7 +122,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join("Project", "static"),
+    os.path.join("mainapp", "static"),
 ]
 
 MEDIA_URL = '/media/'
