@@ -34,17 +34,32 @@ def dataquality_new(request):
                 r=list(Popularuty_m.objects.filter(pk_Dataquality__startswith=i).values_list("popularuty_1", flat=True))
                 q=q+len(r)
                 o=o+sum(r)
-            Dataquality.popularuty = o/q
+            if q != 0:
+                Dataquality.popularuty = o/q/10
+            else:
+                Dataquality.popularuty = o/10
+
+            Dataquality.authority_full =float(authority_def(Dataquality.source))
 
             l=list(Dataquality.__class__.objects.all().values_list("authority", flat=True))
             u=0
             for i in l:
                 if i != None:
                     u=u+float(i)
-            k=u/len(l)
-            g=float(authority_def(Dataquality.source))
+            if len(l) != 0:
+                k=u/len(l)
+                if Dataquality.authority_full < k:
+                    if Dataquality.authority_full == 0:
+                        Dataquality.authority == 0
+                    else:
+                        Dataquality.authority = k/Dataquality.authority_full
+                else:
+                    Dataquality.authority == 1
+            else:
+                Dataquality.authority == 1
+
             Dataquality.availability = availability_def(Dataquality.source)
-            Dataquality.authority = g/k
+
             Dataquality.machinereadability = machinereadability_def(Dataquality.file)
             p=class_dict_def(Dataquality.file)
             Dataquality.relevance = reliability_def(relevance_def(p))

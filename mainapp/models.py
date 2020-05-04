@@ -21,6 +21,7 @@ class Dataquality(models.Model):
     file = models.FileField(verbose_name = "Загрузите файл")
     source = models.URLField(verbose_name = "Укажите его источник", max_length=200)
     availability = models.FloatField(verbose_name = "Доступность", default=None, blank=True, null=True)
+    authority_full = models.FloatField(verbose_name = "Авторитетность абсолютная", default=None, blank=True, null=True)
     authority = models.FloatField(verbose_name = "Авторитетность", default=None, blank=True, null=True)
     popularuty = models.FloatField(verbose_name = "Репутация", default=None, blank=True, null=True)
     machinereadability = models.FloatField(verbose_name = "Интерпретируемость", default=None, blank=True, null=True)

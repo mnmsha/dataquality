@@ -1,7 +1,18 @@
 
+def suggest(query, resource, count=1):
+    API_KEY = "71ee06afab0e693567c6735f3ee0049cf8abe5fa"
+    BASE_URL = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/{}"
+    import json
+    import requests
+    url = BASE_URL.format(resource)
+    headers = {"Authorization": "Token {}".format(API_KEY), "Content-Type": "application/json"}
+    data = {"query": query, "count": count}
+    r = requests.post(url, data=json.dumps(data), headers=headers)
+    return r.json()
+
 def availability_def(hostname):
     import requests
-    r = requests.get(hostname)
+    r = requests.get(hostname, stream=True)
     if r.status_code != 200:
         return 0
     else:
@@ -40,8 +51,8 @@ def class_dict_def(file):
     import pandas as pd
     import os
     filename, file_extension = os.path.splitext(file.name)
-    if file_extension == ".csv":
-        df = pd.read_csv(file, encoding = "utf-8", sep=',', error_bad_lines=False)
+    if file_extension == ".xlsx":
+        df = pd.read_excel(file, encoding = "utf-8", sep=',', error_bad_lines=False)
         for i in list(df):
             for index, row in df.iterrows():
                 r=list(str(row[i]))
@@ -143,35 +154,12 @@ def reliability_def(all_dict):
     return result
 
 def relevance_def(file):
-    import time
-    from selenium import webdriver
-    from selenium.webdriver.common.keys import Keys
-    from selenium.common.exceptions import NoSuchElementException
     for i in file.keys():
-        try:
-            driver = webdriver.Chrome("/Users/Misha/Downloads/chromedriver")
-            driver.get("https://www.rusprofile.ru")
-            time.sleep(0)
-            element = driver.find_element_by_class_name("index-search-input")
-            element.send_keys(str(i))
-            element.submit()
-            time.sleep(3)
-            element_1 = driver.find_element_by_xpath('//*[@id="anketa"]/div[1]/div[1]/div[2]')
-            if element_1.text == "Действующая организация":
-                file[i]="ok"
-            else:
-                file[i]="not ok"
-            driver.quit()
-        except NoSuchElementException:
+        if suggest(i, "party", count=1)["suggestions"][0]['data']['state']['status'] == "ACTIVE":
+            file[i]="ok"
+        else:
             file[i]="not ok"
-            driver.quit()
     return file
-
-
-
-
-
-
 
 def fullness_def(list_class, file):
     list_class_ok=[]
@@ -187,8 +175,8 @@ def fullness_def(list_class, file):
     import pandas as pd
     import os
     filename, file_extension = os.path.splitext(file.name)
-    if file_extension == ".csv":
-        df = pd.read_csv(file, encoding = "utf-8", sep=',', error_bad_lines=False)
+    if file_extension == ".xlsx":
+        df = pd.read_excel(file, encoding = "utf-8", sep=',', error_bad_lines=False)
         for i in list(df):
             for index, row in df.iterrows():
                 r=list(str(row[i]))
@@ -235,9 +223,9 @@ def fullness_def(list_class, file):
                 result = (len(list_class_ok)/len(list_class))
         else:
             result=0
+    else:
+        result=0
     return result
-
-
 
 def popularuty_def(hostname):
     f=dataquality.objects.filter(source=hostname).values("popularuty").values()/len(dataquality.objects.filter(source=hostname).values("popularuty"))
