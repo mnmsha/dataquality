@@ -26,8 +26,8 @@ def authority_def(hostname):
         soup=BeautifulSoup(r.text)
         number=soup.find('span', 'filters__counters').get_text()
     except AttributeError:
-        number=0
-    return int(number)
+        number=0.0
+    return float(number)
 
 
 def machinereadability_def(file):
@@ -155,9 +155,12 @@ def reliability_def(all_dict):
 
 def relevance_def(file):
     for i in file.keys():
-        if suggest(i, "party", count=1)["suggestions"][0]['data']['state']['status'] == "ACTIVE":
-            file[i]="ok"
-        else:
+        try:
+            if suggest(i, "party", count=1)["suggestions"][0]['data']['state']['status'] == "ACTIVE":
+                file[i]="ok"
+            else:
+                file[i]="not ok"
+        except IndexError:
             file[i]="not ok"
     return file
 
